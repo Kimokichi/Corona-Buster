@@ -12,6 +12,7 @@ Phaser.Scene{
         this.shoot=false;
         this.player=undefined;
         this.speed=100
+        this.cursor=undefined;
     }
     preload(){
         this.load.image('background','images/bg_layer1.png')
@@ -38,6 +39,11 @@ Phaser.Scene{
         )
         this.createButton()
         this.player = this.createPlayer ()
+        this.cursor = this.input.keyboard.createCursorKeys();
+        wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     }
     update(time){
         this.clouds.children.iterate((child) =>{
@@ -50,7 +56,7 @@ Phaser.Scene{
                 child.y = 0;
             }
         })
-        // this.movePlayer(this.player,time)
+        this.movePlayer(this.player,time)
     }
     // customized method
     createButton(){
@@ -81,7 +87,7 @@ Phaser.Scene{
                 this.nav_right = true
 
             }, this)
-            nav_right.on('pointerdown',() => {
+            nav_right.on('pointerout',() => {
 
                 this.nav_right = false
 
@@ -98,7 +104,7 @@ Phaser.Scene{
             }, this)
     }
     movePlayer(player,time){
-        if (this.nav_left){
+        if (this.cursor.A.isDown || this.nav_left){
             this.player.setVelocityX(this.speed * -1)
             this.player.anims.play('left',true)
             this.player.setFlipX(false)
@@ -113,7 +119,7 @@ Phaser.Scene{
     }
     createPlayer(){
         const player = this.physics.add.sprite(200,450,'player')
-        player.setColliderWorldBounds(true)
+        player.setCollideWorldBounds(true)
         this.anims.create ({
             key: 'turn',
             frames : [{
