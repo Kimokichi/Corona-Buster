@@ -40,10 +40,6 @@ Phaser.Scene{
         this.createButton()
         this.player = this.createPlayer ()
         this.cursor = this.input.keyboard.createCursorKeys();
-        wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-        aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-        sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-        dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     }
     update(time){
         this.clouds.children.iterate((child) =>{
@@ -104,14 +100,22 @@ Phaser.Scene{
             }, this)
     }
     movePlayer(player,time){
-        if (this.cursor.A.isDown || this.nav_left){
+        if (this.cursor.left.isDown || this.nav_left){
             this.player.setVelocityX(this.speed * -1)
             this.player.anims.play('left',true)
             this.player.setFlipX(false)
-        } else if (this.nav_right){
+        } else if (this.cursor.right.isDown || this.nav_right){
             this.player.setVelocityX(this.speed)
             this.player.anims.play('right',true)
             this.player.setFlipX(true)
+        } else if (this.cursor.up.isDown){
+            this.player.setVelocityY(this.speed * -1)
+            this.player.anims.play('turn',true)
+            this.player.seFtlipX(false)
+        } else if (this.cursor.down.isDown){
+            this.player.setVelocityY(this.speed)
+            this.player.anims.play('turn',true)
+            this.player.setFlipX(false)
         }else {
             this.player.setVelocityX(0)
             this.player.anims.play('turn')
