@@ -1,5 +1,6 @@
 // @ts-nocheck
 import Phaser from 'phaser'
+import FallingObject from '../ui/FallingObject'
 export default class CoronaBusterScene extends
 Phaser.Scene{
     constructor(){
@@ -13,6 +14,8 @@ Phaser.Scene{
         this.player=undefined;
         this.speed=100
         this.cursor=undefined;
+        this.enemies=undefined;
+        this.enemySpeed=50;
     }
     preload(){
         this.load.image('background','images/bg_layer1.png')
@@ -24,6 +27,7 @@ Phaser.Scene{
             frameWidth: 66,
             frameHeight: 66
         })
+        this.load.image('enemy','images/enemy.png')
     }
     create(){
         const gameWidth = this.scale.width*0.5;
@@ -40,6 +44,17 @@ Phaser.Scene{
         this.createButton()
         this.player = this.createPlayer ()
         this.cursor = this.input.keyboard.createCursorKeys();
+        this.enemies= this.physics.add.group({
+            classType: FallingObject,
+            maxSize: 10,
+            runChildUpdate: true
+        })
+        this.time.addEvent({
+            delay : Phaser.Math.Between(1000,5000),
+            callback: this.spawnEnemy,
+            callbackScope: this,
+            loop: true
+        })
     }
     update(time){
         this.clouds.children.iterate((child) =>{
@@ -143,5 +158,17 @@ Phaser.Scene{
             })
         })
         return player
+    }
+    spawnEnemy(){
+        const config = {
+            speed : 50,
+            rotation : 0.1
+        }
+        // ts-@ignore
+        const enemy = this.enemies.get(0,0,'enemy',config)
+        const positionX = Phaser.Math.Between(50,350)
+        if (enemy){
+            enemy.spawn(positionX)
+        }
     }
 }
