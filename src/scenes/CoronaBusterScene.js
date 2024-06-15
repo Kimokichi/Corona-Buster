@@ -1,6 +1,7 @@
 // @ts-nocheck
 import Phaser from 'phaser'
 import FallingObject from '../ui/FallingObject'
+import Laser from '../ui/Laser'
 export default class CoronaBusterScene extends
 Phaser.Scene{
     constructor(){
@@ -16,6 +17,8 @@ Phaser.Scene{
         this.cursor=undefined;
         this.enemies=undefined;
         this.enemySpeed=50;
+        this.lasers=undefined;
+        this.lastFired=10;
     }
     preload(){
         this.load.image('background','images/bg_layer1.png')
@@ -28,6 +31,10 @@ Phaser.Scene{
             frameHeight: 66
         })
         this.load.image('enemy','images/enemy.png')
+        this.load.spritesheet('laser','images/laser-bolts.png',{
+            frameWidth: 16,
+            frameHeight:16
+        })
     }
     create(){
         const gameWidth = this.scale.width*0.5;
@@ -55,6 +62,18 @@ Phaser.Scene{
             callbackScope: this,
             loop: true
         })
+        this.lasers = this.physics.add.group({
+            classType: Laser,
+            maxSize: 10,
+            runChildUpdate: true
+        })
+        this.physics.add.overlap(
+            this.laser,
+            this.enemy,
+            this.hitEnemy,
+            null,
+            this
+        )
     }
     update(time){
         this.clouds.children.iterate((child) =>{
@@ -135,6 +154,14 @@ Phaser.Scene{
             this.player.setVelocityX(0)
             this.player.anims.play('turn')
         }
+        //above there's code for moving player
+        if((this.shoot) && time > this.lastFired) {
+            const laser = this.lasers.get(0, 0, 'laser')
+            if (laser) {
+                laser.fire(this.player.x, this.player.y)
+                this.lastFired = time + 150
+            }
+        }
     }
     createPlayer(){
         const player = this.physics.add.sprite(200,450,'player')
@@ -170,5 +197,9 @@ Phaser.Scene{
         if (enemy){
             enemy.spawn(positionX)
         }
+    }
+    hitEnemy(laser,enemy){
+        laser.die()
+        enemy.die()
     }
 }
